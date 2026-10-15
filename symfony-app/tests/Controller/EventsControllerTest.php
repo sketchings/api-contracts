@@ -55,11 +55,93 @@ class EventsControllerTest extends ApiTestCase
         self::assertSame(['Llama Street Art Through the Ages', 'Pirate Coding Workshop', 'The Great Parrot Debate'], array_column($events, 'name'));
     }
 
-    public function testListSpecialEventsRejectsInvertedRange(): void
+    public function testCreateSpecialEventIgnoresClientEventId(): void
     {
-        $this->request('GET', '/special-events?startDate=2023-09-10&endDate=2023-09-06');
+        $event = $this->request('POST', '/special-events', [
+            'eventId' => '11111111-1111-4111-8111-111111111111',
+            'name' => 'Sasquatch Ballet',
+            'location' => 'Seattle... probably',
+            'eventDescription' => 'Graceful.',
+            'dates' => ['2023-12-15'],
+            'price' => 40,
+        ]);
 
+        self::assertResponseStatusCodeSame(201);
+        self::assertNotSame('11111111-1111-4111-8111-111111111111', $event['eventId']);
+    }
+
+    /**
+     * Unknown keys used to reach PropertyAccess, which threw a 500 on keys like "[".
+     */
+    public function testUnknownFieldsAreRejected(): void
+    {
+        $problem = $this->request('POST', '/special-events', [
+            '[' => 1,
+            'name' => 'Sasquatch Ballet',
+            'location' => 'Seattle... probably',
+            'eventDescription' => 'Graceful.',
+            'dates' => [],
+            'price' => 40,
+        ]);
         $this->assertProblem(400);
+        self::assertSame('[', $problem['violations'][0]['propertyPath']);
+
+        $this->request('PATCH', '/special-events/'.self::MERMAID, ['a[b' => 1]);
+        $this->assertProblem(400);
+    }
+
+    public function testListSpecialEventsRejectsInvalidQuery(): void
+    {
+        foreach (['startDate=', 'endDate=', 'limit=0', 'page=0'] as $query) {
+            $this->request('GET', '/special-events?'.$query);
+            $this->assertProblem(400);
+        }
+    }
+
+    public function testListSpecialEventsWithInvertedRangeIsEmpty(): void
+    {
+        self::assertSame([], $this->request('GET', '/special-events?startDate=2023-09-10&endDate=2023-09-06'));
+        self::assertResponseIsSuccessful();
+    }
+
+    public function testListSpecialEventsBeyondTheLastPageIsEmpty(): void
+    {
+        self::assertSame([], $this->request('GET', '/special-events?page='.\PHP_INT_MAX.'&limit=30'));
+        self::assertResponseIsSuccessful();
+    }
+
+    public function testRequestBodyMustBeAJsonObject(): void
+    {
+        foreach (['null', '[]', '"name"'] as $body) {
+            $this->client->request('PATCH', '/special-events/'.self::MERMAID, server: ['CONTENT_TYPE' => 'application/json'], content: $body);
+            $this->assertResponseMatchesOpenApiSchema($this->client->getRequest(), $this->client->getResponse());
+            $this->assertProblem(400);
+        }
+    }
+
+    public function testNullValuesAreRejected(): void
+    {
+        $problem = $this->request('PATCH', '/special-events/'.self::MERMAID, ['price' => null]);
+        $this->assertProblem(400);
+        self::assertSame('"price" must not be null.', $problem['detail']);
+
+        $this->request('POST', '/special-events', [
+            'eventId' => null,
+            'name' => 'Sasquatch Ballet',
+            'location' => 'Seattle... probably',
+            'eventDescription' => 'Graceful.',
+            'dates' => ['2023-12-15'],
+            'price' => 40,
+        ]);
+        $this->assertProblem(400);
+    }
+
+    public function testDatesMustBeAList(): void
+    {
+        foreach ([new \stdClass(), ['first' => '2023-09-05']] as $dates) {
+            $this->request('PATCH', '/special-events/'.self::MERMAID, ['dates' => $dates]);
+            $this->assertProblem(400);
+        }
     }
 
     public function testGetSpecialEvent(): void
@@ -113,15 +195,6 @@ class EventsControllerTest extends ApiTestCase
 
         $this->request('DELETE', '/special-events/00000000-0000-4000-8000-000000000000');
         $this->assertProblem(404);
-    }
-
-    public function testDeleteSpecialEventRequiresBasicAuth(): void
-    {
-        $this->client->setServerParameters([]);
-        $this->request('DELETE', '/special-events/'.self::MERMAID);
-
-        $this->assertProblem(401);
-        self::assertResponseHasHeader('WWW-Authenticate');
     }
 
     public function testDeleteSpecialEvent(): void

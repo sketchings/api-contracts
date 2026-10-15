@@ -1,0 +1,6 @@
+framework:
+    serializer:
+        default_context:
+            # Reject unknown request fields (the spec declares `unevaluatedProperties: false`).
+            # Ignoring them also passed arbitrary keys to PropertyAccess, which crashed on keys like "[".
+            allow_extra_attributes: false

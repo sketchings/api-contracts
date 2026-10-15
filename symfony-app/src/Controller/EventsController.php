@@ -57,7 +57,8 @@ class EventsController extends AbstractController
             $startDate = new \DateTimeImmutable('today')->format('Y-m-d');
         }
 
-        $events = $this->events->findOccurringBetween($startDate, $endDate, $query->page, $query->limit);
+        $offset = $query->offset();
+        $events = null === $offset ? [] : $this->events->findOccurringBetween($startDate, $endDate, $offset, $query->limit);
 
         return $this->json(array_map(static fn (SpecialEvent $event) => $event->toArray(), $events));
     }

@@ -1,5 +1,7 @@
 type: object
 properties:
+  # Not readOnly: the publishNewEvent webhook sends it in a request body.
+  # The API ignores it when creating an event.
   eventId:
     $ref: ./EventId.yaml
   name:
@@ -18,3 +20,4 @@ required:
   - eventDescription
   - dates
   - price
+unevaluatedProperties: false

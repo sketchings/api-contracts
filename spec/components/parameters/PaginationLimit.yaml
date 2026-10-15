@@ -4,5 +4,6 @@ description: Number of days per page.
 schema:
   type: integer
   default: 10
+  minimum: 1
   maximum: 30
   example: 15

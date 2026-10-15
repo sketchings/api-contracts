@@ -10,3 +10,4 @@ properties:
     $ref: ./EventDates.yaml
   price:
     $ref: ./EventPrice.yaml
+unevaluatedProperties: false

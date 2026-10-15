@@ -1,8 +1,32 @@
 description: Data to purchase a ticket.
 type: object
-allOf:
-  - type: object
-    properties:
-      email:
-        $ref: ./Email.yaml
-  - $ref: ./Ticket.yaml
+properties:
+  email:
+    $ref: ./Email.yaml
+  ticketType:
+    $ref: ./TicketType.yaml
+  ticketDate:
+    description: Date when this ticket can be used for museum entry.
+    $ref: ./Date.yaml
+  eventId:
+    description: >-
+      Unique identifier for a special event. Required for `event` tickets and
+      not allowed for `general` tickets.
+    $ref: ./EventId.yaml
+required:
+  - ticketType
+  - ticketDate
+additionalProperties: false
+if:
+  properties:
+    ticketType:
+      const: event
+  required:
+    - ticketType
+then:
+  required:
+    - eventId
+else:
+  not:
+    required:
+      - eventId

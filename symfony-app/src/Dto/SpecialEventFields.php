@@ -17,6 +17,7 @@ class SpecialEventFields
         #[Assert\NotBlank(allowNull: true)]
         public ?string $eventDescription = null,
         /** @var list<string>|null */
+        #[Assert\Type('list')]
         #[Assert\All([new Assert\NotBlank(), new Assert\Date()])]
         public ?array $dates = null,
         #[Assert\PositiveOrZero]

@@ -50,7 +50,7 @@
             <parameter name="specs" value="openapi"/>
             <!-- Gesso doesn't enforce http/basic; the RequiresBasicAuth tests cover it. -->
             <parameter name="acknowledged_unvalidatable_schemes" value="MuseumPlaceholderAuth"/>
-            <parameter name="strict_additional_properties" value="warn"/>
+            <parameter name="strict_additional_properties" value="fail"/>
             <!-- Fails when a response not listed in this file goes untested. Regenerate: GESSO_BASELINE_GENERATE=1 bin/phpunit -->
             <parameter name="coverage_baseline_file" value="gesso-coverage-baseline.json"/>
         </bootstrap>

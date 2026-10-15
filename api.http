@@ -4,3 +4,25 @@ Accept: application/json
 Authorization: Basic {{username}} {{password}}
 
 ###
+GET https://{{host}}/special-events
+Authorization: Basic {{username}} {{password}}
+
+###
+GET https://{{host}}/special-events/{eventId}
+Authorization: Basic {{username}} {{password}}
+
+###
+GET https://{{host}}/tickets
+Authorization: Basic {{username}} {{password}}
+
+###
+GET https://{{host}}/tickets/{ticketId}/qr
+Authorization: Basic {{username}} {{password}}
+
+###
+POST https://{{host}}/special-events
+Authorization: Basic {{username}} {{password}}
+
+###
+POST https://{{host}}/tickets
+Authorization: Basic {{username}} {{password}}

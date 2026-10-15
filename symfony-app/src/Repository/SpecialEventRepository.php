@@ -22,7 +22,7 @@ class SpecialEventRepository extends ServiceEntityRepository
      *
      * @return list<SpecialEvent>
      */
-    public function findOccurringBetween(?string $startDate, ?string $endDate, int $page, int $limit): array
+    public function findOccurringBetween(?string $startDate, ?string $endDate, int $offset, int $limit): array
     {
         $events = $this->findBy([], ['name' => 'ASC']);
 
@@ -33,6 +33,6 @@ class SpecialEventRepository extends ServiceEntityRepository
             );
         }
 
-        return \array_slice(array_values($events), ($page - 1) * $limit, $limit);
+        return \array_slice(array_values($events), $offset, $limit);
     }
 }

@@ -3,6 +3,7 @@ type: object
 properties:
   ticketId:
     $ref: ./TicketId.yaml
+    readOnly: true
   ticketDate:
     description: Date when this ticket can be used for museum entry.
     $ref: ./Date.yaml
@@ -16,3 +17,17 @@ properties:
 required:
   - ticketType
   - ticketDate
+# Event tickets need the event; general admission tickets must not name one.
+if:
+  properties:
+    ticketType:
+      const: event
+  required:
+    - ticketType
+then:
+  required:
+    - eventId
+else:
+  not:
+    required:
+      - eventId

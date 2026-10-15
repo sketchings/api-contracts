@@ -23,10 +23,30 @@ post:
           examples:
             default_example:
               $ref: ../components/examples/CreateSpecialEventResponseExample.yaml
+      links:
+        GetSpecialEvent:
+          description: The `eventId` returned can be used to get the event.
+          operationId: getSpecialEvent
+          parameters:
+            eventId: $response.body#/eventId
+        UpdateSpecialEvent:
+          description: The `eventId` returned can be used to update the event.
+          operationId: updateSpecialEvent
+          parameters:
+            eventId: $response.body#/eventId
+        DeleteSpecialEvent:
+          description: The `eventId` returned can be used to delete the event.
+          operationId: deleteSpecialEvent
+          parameters:
+            eventId: $response.body#/eventId
     '400':
       $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
     '404':
       $ref: ../components/responses/NotFound.yaml
+    '415':
+      $ref: ../components/responses/UnsupportedMediaType.yaml
 get:
   summary: List special events
   description: Return a list of upcoming special events at the museum.
@@ -50,5 +70,7 @@ get:
               $ref: ../components/examples/ListSpecialEventsResponseExample.yaml
     '400':
       $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
     '404':
       $ref: ../components/responses/NotFound.yaml

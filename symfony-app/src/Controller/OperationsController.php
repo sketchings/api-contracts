@@ -20,7 +20,8 @@ class OperationsController extends AbstractController
         #[MapQueryString(validationFailedStatusCode: 400)] PaginationQuery $query = new PaginationQuery(),
     ): JsonResponse {
         $startDate = new \DateTimeImmutable($query->startDate ?? 'today');
+        $offset = $query->offset();
 
-        return $this->json($hoursProvider->getHours($startDate, $query->page, $query->limit));
+        return $this->json(null === $offset ? [] : $hoursProvider->getHours($startDate, $offset, $query->limit));
     }
 }

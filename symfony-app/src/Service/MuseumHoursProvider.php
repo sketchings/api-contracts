@@ -6,7 +6,7 @@ namespace App\Service;
  * Builds `#/components/schemas/MuseumHours`.
  *
  * The museum is open 09:00–18:00 Monday to Thursday, 10:00–16:00 on Friday,
- * and closed at weekends. Each page holds `$limit` opening days.
+ * and closed at weekends. Pages are counted in opening days.
  */
 class MuseumHoursProvider
 {
@@ -18,15 +18,31 @@ class MuseumHoursProvider
         5 => ['10:00', '16:00'],
     ];
 
+    /** Every 7 consecutive days contain this many opening days. */
+    private const int OPENING_DAYS_PER_WEEK = 5;
+
+    /** `format: date` allows four-digit years only. */
+    private const string LAST_DATE = '9999-12-31';
+
     /**
+     * @param int $offset number of opening days to skip
+     *
      * @return list<array{date: string, timeOpen: string, timeClose: string}>
      */
-    public function getHours(\DateTimeImmutable $startDate, int $page, int $limit): array
+    public function getHours(\DateTimeImmutable $startDate, int $offset, int $limit): array
     {
-        $skip = ($page - 1) * $limit;
-        $hours = [];
+        $lastDate = new \DateTimeImmutable(self::LAST_DATE);
 
-        for ($date = $startDate; \count($hours) < $limit; $date = $date->modify('+1 day')) {
+        // Jump whole weeks instead of stepping through every skipped day.
+        $weeks = intdiv($offset, self::OPENING_DAYS_PER_WEEK);
+        if ($weeks > intdiv($startDate->diff($lastDate)->days, 7)) {
+            return [];
+        }
+        $date = $startDate->modify(\sprintf('+%d days', $weeks * 7));
+        $skip = $offset % self::OPENING_DAYS_PER_WEEK;
+
+        $hours = [];
+        for (; \count($hours) < $limit && $date <= $lastDate; $date = $date->modify('+1 day')) {
             $opening = self::HOURS_BY_WEEKDAY[(int) $date->format('N')] ?? null;
             if (null === $opening) {
                 continue;

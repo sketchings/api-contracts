@@ -27,7 +27,17 @@ post:
               $ref: ../components/examples/BuyGeneralTicketsResponseExample.yaml
             event_entry:
               $ref: ../components/examples/BuyEventTicketsResponseExample.yaml
+      links:
+        GetTicketCode:
+          description: The `ticketId` returned can be used to get the ticket's QR code.
+          operationId: getTicketCode
+          parameters:
+            ticketId: $response.body#/ticketId
     '400':
       $ref: ../components/responses/BadRequest.yaml
+    '401':
+      $ref: ../components/responses/Unauthorized.yaml
     '404':
       $ref: ../components/responses/NotFound.yaml
+    '415':
+      $ref: ../components/responses/UnsupportedMediaType.yaml

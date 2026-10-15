@@ -4,4 +4,5 @@ description: Page number to retrieve.
 schema:
   type: integer
   default: 1
+  minimum: 1
   example: 2

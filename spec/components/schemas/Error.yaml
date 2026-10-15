@@ -6,3 +6,23 @@ properties:
   title:
     type: string
     example: Validation failed
+  status:
+    description: HTTP status code.
+    type: integer
+    example: 400
+  detail:
+    description: Explanation specific to this occurrence of the problem.
+    type: string
+    example: Validation failed.
+  violations:
+    description: Present when request validation fails.
+    type: array
+    items:
+      type: object
+      properties:
+        propertyPath:
+          type: string
+          example: price
+        message:
+          type: string
+          example: This value should be either positive or zero.

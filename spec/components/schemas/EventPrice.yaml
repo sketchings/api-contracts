@@ -1,4 +1,5 @@
 description: Price of a ticket for the special event.
 type: number
 format: float
+minimum: 0
 example: 25

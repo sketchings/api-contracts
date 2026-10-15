@@ -14,11 +14,13 @@ class BuyMuseumTickets
     public function __construct(
         #[Assert\NotNull]
         public ?TicketType $ticketType = null,
-        #[Assert\NotNull]
+        #[Assert\NotBlank]
         #[Assert\Date]
         public ?string $ticketDate = null,
+        #[Assert\NotBlank(allowNull: true)]
         #[Assert\Uuid]
         public ?string $eventId = null,
+        #[Assert\NotBlank(allowNull: true)]
         #[Assert\Email]
         public ?string $email = null,
     ) {

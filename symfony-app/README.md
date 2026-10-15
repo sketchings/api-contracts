@@ -43,6 +43,8 @@ Route names match the `operationId`s (`bin/console debug:router`).
 - Museum hours: Mon–Thu 09:00–18:00, Fri 10:00–16:00, closed weekends. `limit` counts opening days.
 - `GET /special-events` returns all events when neither `startDate` nor `endDate` is given (the example data is from 2023). When one is given, the other gets the spec's default (`endDate` = `startDate` + 7 days; `startDate` = today).
 - Event tickets require an `eventId` and a `ticketDate` that is one of the event's dates.
+- `endDate` before `startDate` returns an empty list, as does a page past the end.
+- Request bodies must be JSON objects. Unknown fields and `null` values are rejected with a 400 that names the field; anything other than `application/json` gets a 415.
 - Webhooks are sent on `kernel.terminate`, after the API response has gone out.
 
 ## Tests

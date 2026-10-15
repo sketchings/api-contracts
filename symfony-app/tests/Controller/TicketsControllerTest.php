@@ -51,6 +51,18 @@ class TicketsControllerTest extends ApiTestCase
 
         $this->request('POST', '/tickets', ['ticketType' => 'vip', 'ticketDate' => '2023-09-05']);
         $this->assertProblem(400);
+
+        // Empty strings used to slip past the Uuid/Date/Email constraints (eventId "" was a 500).
+        foreach ([['eventId' => ''], ['ticketDate' => ''], ['email' => '']] as $blank) {
+            $this->request('POST', '/tickets', [...['ticketType' => 'event', 'eventId' => self::MERMAID, 'ticketDate' => '2023-09-05'], ...$blank]);
+            $this->assertProblem(400);
+        }
+
+        $this->request('POST', '/tickets', ['ticketType' => 'general', 'eventId' => self::MERMAID, 'ticketDate' => '2023-09-05']);
+        $this->assertProblem(400);
+
+        $this->request('POST', '/tickets', ['ticketType' => 'general', 'ticketId' => self::MERMAID, 'ticketDate' => '2023-09-05']);
+        $this->assertProblem(400);
     }
 
     public function testGetTicketCode(): void

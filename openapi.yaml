@@ -11,7 +11,7 @@ info:
     name: MIT
     url: https://opensource.org/license/mit/
 servers:
-  - url: https://localhost:8000/museum-api
+  - url: https://localhost:8000
 security:
   - MuseumPlaceholderAuth: []
 tags:
@@ -45,6 +45,8 @@ paths:
                   $ref: '#/components/examples/GetMuseumHoursResponseExample'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
   /special-events:
@@ -73,10 +75,30 @@ paths:
               examples:
                 default_example:
                   $ref: '#/components/examples/CreateSpecialEventResponseExample'
+          links:
+            GetSpecialEvent:
+              description: The `eventId` returned can be used to get the event.
+              operationId: getSpecialEvent
+              parameters:
+                eventId: $response.body#/eventId
+            UpdateSpecialEvent:
+              description: The `eventId` returned can be used to update the event.
+              operationId: updateSpecialEvent
+              parameters:
+                eventId: $response.body#/eventId
+            DeleteSpecialEvent:
+              description: The `eventId` returned can be used to delete the event.
+              operationId: deleteSpecialEvent
+              parameters:
+                eventId: $response.body#/eventId
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
     get:
       summary: List special events
       description: Return a list of upcoming special events at the museum.
@@ -100,6 +122,8 @@ paths:
                   $ref: '#/components/examples/ListSpecialEventsResponseExample'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
   /special-events/{eventId}:
@@ -123,6 +147,8 @@ paths:
                   $ref: '#/components/examples/GetSpecialEventResponseExample'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
     patch:
@@ -154,8 +180,12 @@ paths:
                   $ref: '#/components/examples/UpdateSpecialEventResponseExample'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
     delete:
       summary: Delete special event
       description: Delete a special event from the collection. Allows museum to cancel planned events.
@@ -203,10 +233,20 @@ paths:
                   $ref: '#/components/examples/BuyGeneralTicketsResponseExample'
                 event_entry:
                   $ref: '#/components/examples/BuyEventTicketsResponseExample'
+          links:
+            GetTicketCode:
+              description: The `ticketId` returned can be used to get the ticket's QR code.
+              operationId: getTicketCode
+              parameters:
+                ticketId: $response.body#/ticketId
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
   /tickets/{ticketId}/qr:
     get:
       summary: Get ticket QR code
@@ -225,6 +265,8 @@ paths:
                 $ref: '#/components/schemas/TicketCodeImage'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 webhooks:
@@ -267,6 +309,7 @@ components:
       schema:
         type: integer
         default: 1
+        minimum: 1
         example: 2
     PaginationLimit:
       name: limit
@@ -275,6 +318,7 @@ components:
       schema:
         type: integer
         default: 10
+        minimum: 1
         maximum: 30
         example: 15
     EndDate:
@@ -344,6 +388,26 @@ components:
         title:
           type: string
           example: Validation failed
+        status:
+          description: HTTP status code.
+          type: integer
+          example: 400
+        detail:
+          description: Explanation specific to this occurrence of the problem.
+          type: string
+          example: Validation failed.
+        violations:
+          description: Present when request validation fails.
+          type: array
+          items:
+            type: object
+            properties:
+              propertyPath:
+                type: string
+                example: price
+              message:
+                type: string
+                example: This value should be either positive or zero.
     EventId:
       description: Identifier for a special event.
       type: string
@@ -351,14 +415,17 @@ components:
       example: 3be6453c-03eb-4357-ae5a-984a0e574a54
     EventName:
       type: string
+      minLength: 1
       description: Name of the special event.
       example: Pirate Coding Workshop
     EventLocation:
       type: string
+      minLength: 1
       description: Location where the special event is held.
       example: Computer Room
     EventDescription:
       type: string
+      minLength: 1
       description: Description of the special event.
       example: Captain Blackbeard shares his love of the C...language. And possibly Arrrrr (R lang).
     EventDates:
@@ -370,6 +437,7 @@ components:
       description: Price of a ticket for the special event.
       type: number
       format: float
+      minimum: 0
       example: 25
     SpecialEvent:
       type: object
@@ -392,6 +460,7 @@ components:
         - eventDescription
         - dates
         - price
+      unevaluatedProperties: false
     SpecialEventCollection:
       description: List of upcoming special events.
       type: array
@@ -410,16 +479,12 @@ components:
           $ref: '#/components/schemas/EventDates'
         price:
           $ref: '#/components/schemas/EventPrice'
+      unevaluatedProperties: false
     Email:
       description: Email address for ticket purchaser.
       type: string
       format: email
       example: museum-lover@example.com
-    TicketId:
-      description: Unique identifier for museum ticket. Generated when purchased.
-      type: string
-      format: uuid
-      example: a54a57ca-36f8-421b-a6b4-2e8f26858a4c
     TicketType:
       description: Type of ticket being purchased. Use `general` for regular museum entry and `event` for tickets to special events.
       type: string
@@ -427,12 +492,49 @@ components:
         - event
         - general
       example: event
+    BuyMuseumTickets:
+      description: Data to purchase a ticket.
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        ticketType:
+          $ref: '#/components/schemas/TicketType'
+        ticketDate:
+          description: Date when this ticket can be used for museum entry.
+          $ref: '#/components/schemas/Date'
+        eventId:
+          description: Unique identifier for a special event. Required for `event` tickets and not allowed for `general` tickets.
+          $ref: '#/components/schemas/EventId'
+      required:
+        - ticketType
+        - ticketDate
+      additionalProperties: false
+      if:
+        properties:
+          ticketType:
+            const: event
+        required:
+          - ticketType
+      then:
+        required:
+          - eventId
+      else:
+        not:
+          required:
+            - eventId
+    TicketId:
+      description: Unique identifier for museum ticket. Generated when purchased.
+      type: string
+      format: uuid
+      example: a54a57ca-36f8-421b-a6b4-2e8f26858a4c
     Ticket:
       description: Ticket for museum entry, can be general admission or special event.
       type: object
       properties:
         ticketId:
           $ref: '#/components/schemas/TicketId'
+          readOnly: true
         ticketDate:
           description: Date when this ticket can be used for museum entry.
           $ref: '#/components/schemas/Date'
@@ -444,15 +546,19 @@ components:
       required:
         - ticketType
         - ticketDate
-    BuyMuseumTickets:
-      description: Data to purchase a ticket.
-      type: object
-      allOf:
-        - type: object
-          properties:
-            email:
-              $ref: '#/components/schemas/Email'
-        - $ref: '#/components/schemas/Ticket'
+      if:
+        properties:
+          ticketType:
+            const: event
+        required:
+          - ticketType
+      then:
+        required:
+          - eventId
+      else:
+        not:
+          required:
+            - eventId
     TicketMessage:
       description: Confirmation message after a ticket purchase.
       type: string
@@ -675,7 +781,7 @@ components:
       value:
         message: Museum special event ticket purchased
         ticketId: b811f723-17b2-44f7-8952-24b03e43d8a9
-        eventName: Mermaid Treasure Identification and Analysis
+        eventId: dad4bce8-f5cb-4078-a211-995864315e39
         ticketType: event
         ticketDate: '2023-09-05'
         confirmationCode: ticket-event-9c55eg-8v82a
@@ -686,14 +792,20 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Error'
     NotFound:
       description: Not found.
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Unauthorized.
+    UnsupportedMediaType:
+      description: Unsupported media type. The request body must be sent as `application/json`.
       content:
         application/problem+json:
           schema:
