@@ -1,0 +1,67 @@
+arazzo: 1.0.1
+info:
+  title: Special events workflow (exercise starter)
+  description: >-
+    Exercise 2: create a special event, fetch it by its new id, then update it
+    and assert the new value. Run with `make respect FILE=exercises/special-events.arazzo.yaml`.
+  version: 1.0.0
+
+sourceDescriptions:
+  - name: museum-api
+    type: openapi
+    url: ../openapi.yaml
+    x-serverUrl: "https://localhost:8000"
+
+workflows:
+  - workflowId: special-event-lifecycle
+    description: Create, fetch, and update a special event.
+    # Credentials come from the MUSEUM_API_USER / MUSEUM_API_PASSWORD environment
+    # variables (the Makefile sets defaults). You don't need to change this part.
+    inputs:
+      type: object
+      properties:
+        env:
+          type: object
+          properties:
+            MUSEUM_API_USER:
+              type: string
+            MUSEUM_API_PASSWORD:
+              type: string
+              format: password
+          required:
+            - MUSEUM_API_USER
+            - MUSEUM_API_PASSWORD
+      required:
+        - env
+    x-security:
+      - schemeName: MuseumPlaceholderAuth
+        values:
+          username: $inputs.env.MUSEUM_API_USER
+          password: $inputs.env.MUSEUM_API_PASSWORD
+    steps:
+      # A finished example step to copy from.
+      - stepId: list-events
+        description: List the special events.
+        operationId: listSpecialEvents
+        successCriteria:
+          - condition: $statusCode == 200
+
+      # TODO 1 — create-event
+      #   operationId: createSpecialEvent
+      #   requestBody.payload: name, location, eventDescription, dates, price
+      #   successCriteria: status 201
+      #   outputs: eventId from the response body ($response.body#/eventId)
+
+      # TODO 2 — get-event
+      #   operationId: getSpecialEvent
+      #   parameters: eventId (in: path) = the create step's output
+      #     ($steps.create-event.outputs.eventId)
+      #   successCriteria: status 200
+
+      # TODO 3 — update-event
+      #   operationId: updateSpecialEvent, same eventId parameter
+      #   requestBody.payload: change one field, e.g. price
+      #   successCriteria: status 200, plus a jsonpath check on the new value:
+      #     - context: $response.body
+      #       condition: $[?(@.price == 15)]
+      #       type: jsonpath

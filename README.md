@@ -42,6 +42,10 @@ The Museum API has the following core features (sorted by tags):
 - `arazzo/museum-tickets.arazzo.yaml` is an Arazzo 1.0.0 description of using the Museum OpenAPI source to describe an API sequence.
 - `arazzo/museum-api.arazzo.yaml` is an Arazzo 1.0.0 description using both the Museum API and another Arazzo file to describe a series of multi-step API workflows and passing the variables between them.
 
+## Workshop exercises
+
+The hands-on exercises for the API contracts tutorial are in [`exercises/README.md`](exercises/README.md).
+
 ## Getting started
 
 1. Clone this repo.

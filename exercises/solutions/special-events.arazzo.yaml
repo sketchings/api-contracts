@@ -1,0 +1,92 @@
+arazzo: 1.0.1
+info:
+  title: Special events workflow (exercise solution)
+  description: >-
+    Exercise 2: create a special event, fetch it by its new id, then update it
+    and assert the new value. Run with `make respect FILE=exercises/special-events.arazzo.yaml`.
+  version: 1.0.0
+
+sourceDescriptions:
+  - name: museum-api
+    type: openapi
+    url: ../../openapi.yaml
+    x-serverUrl: "https://localhost:8000"
+
+workflows:
+  - workflowId: special-event-lifecycle
+    description: Create, fetch, and update a special event.
+    # Credentials come from the MUSEUM_API_USER / MUSEUM_API_PASSWORD environment
+    # variables (the Makefile sets defaults). You don't need to change this part.
+    inputs:
+      type: object
+      properties:
+        env:
+          type: object
+          properties:
+            MUSEUM_API_USER:
+              type: string
+            MUSEUM_API_PASSWORD:
+              type: string
+              format: password
+          required:
+            - MUSEUM_API_USER
+            - MUSEUM_API_PASSWORD
+      required:
+        - env
+    x-security:
+      - schemeName: MuseumPlaceholderAuth
+        values:
+          username: $inputs.env.MUSEUM_API_USER
+          password: $inputs.env.MUSEUM_API_PASSWORD
+    steps:
+      # A finished example step to copy from.
+      - stepId: list-events
+        description: List the special events.
+        operationId: listSpecialEvents
+        successCriteria:
+          - condition: $statusCode == 200
+
+      - stepId: create-event
+        description: Create a special event.
+        operationId: createSpecialEvent
+        requestBody:
+          payload:
+            name: Pirate Coding Workshop
+            location: Computer Room
+            eventDescription: Captain Blackbeard shares his love of the C...language.
+            dates:
+              - '2023-10-29'
+            price: 45
+        successCriteria:
+          - condition: $statusCode == 201
+        outputs:
+          eventId: $response.body#/eventId
+
+      - stepId: get-event
+        description: Fetch the event created in the previous step.
+        operationId: getSpecialEvent
+        parameters:
+          - name: eventId
+            in: path
+            value: $steps.create-event.outputs.eventId
+        successCriteria:
+          - condition: $statusCode == 200
+          - context: $response.body
+            condition: $[?(@.name == 'Pirate Coding Workshop')]
+            type: jsonpath
+
+      - stepId: update-event
+        description: Change the price and check the new value.
+        operationId: updateSpecialEvent
+        parameters:
+          - name: eventId
+            in: path
+            value: $steps.create-event.outputs.eventId
+        requestBody:
+          payload:
+            price: 15
+        successCriteria:
+          - condition: $statusCode == 200
+          - context: $response.body
+            condition: $[?(@.price == 15)]
+            type: jsonpath

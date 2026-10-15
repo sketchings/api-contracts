@@ -47,6 +47,14 @@ arazzo-test:
 	$(MAKE) --no-print-directory arazzo-db-reset || failed=1; \
 	exit $$failed
 
+# Run Respect on one Arazzo file, e.g. `make respect FILE=exercises/special-events.arazzo.yaml`.
+respect:
+	@test -n "$(FILE)" || { echo "Usage: make respect FILE=path/to/file.arazzo.yaml"; exit 2; }
+	@npx @redocly/cli@latest respect "$(FILE)" --har-output="$(LOG_DIR)/$$(basename "$(FILE)" .arazzo.yaml).har"; \
+	status=$$?; \
+	$(MAKE) --no-print-directory arazzo-db-reset || status=1; \
+	exit $$status
+
 # Restore the Symfony dev database to its seeded state, removing the tickets and
 # events created by the Arazzo workflows and Schemathesis.
 arazzo-db-reset:
