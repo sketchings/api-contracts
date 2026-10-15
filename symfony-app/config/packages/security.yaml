@@ -1,0 +1,25 @@
+security:
+    password_hashers:
+        # Credentials come from environment variables, so they are compared as-is.
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        museum_users:
+            memory:
+                users:
+                    '%env(MUSEUM_API_USER)%': { password: '%env(MUSEUM_API_PASSWORD)%', roles: ['ROLE_USER'] }
+
+    firewalls:
+        dev:
+            pattern: ^/(_profiler|_wdt|_error)/
+            security: false
+        main:
+            stateless: true
+            provider: museum_users
+            # MuseumPlaceholderAuth: `type: http, scheme: basic`
+            http_basic:
+                realm: Museum API
+            entry_point: App\Security\ProblemAuthenticationEntryPoint
+
+    access_control:
+        - { path: ^/, roles: ROLE_USER }

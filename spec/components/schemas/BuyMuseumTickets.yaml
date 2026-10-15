@@ -1,0 +1,8 @@
+description: Data to purchase a ticket.
+type: object
+allOf:
+  - type: object
+    properties:
+      email:
+        $ref: ./Email.yaml
+  - $ref: ./Ticket.yaml

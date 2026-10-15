@@ -1,0 +1,4 @@
+description: List of museum operating hours for a date range.
+type: array
+items:
+  $ref: ./MuseumDailyHours.yaml

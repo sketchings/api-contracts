@@ -17,6 +17,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@redocly/cli": "latest"
+    "@redocly/cli": "^2.26.0"
   }
 }

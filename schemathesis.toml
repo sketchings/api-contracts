@@ -1,0 +1,18 @@
+# Schemathesis property-based API tests (`make schemathesis`).
+# https://schemathesis.readthedocs.io/en/stable/reference/configuration/
+
+# The Symfony app (`symfony serve`) uses a self-signed local certificate.
+tls-verify = false
+
+[auth.openapi.MuseumPlaceholderAuth]
+username = "${MUSEUM_API_USER}"
+password = "${MUSEUM_API_PASSWORD}"
+
+[reports]
+directory = "logs/schemathesis"
+
+[reports.junit]
+enabled = true
+
+[reports.har]
+enabled = true

@@ -26,3 +26,4 @@ rules:
       pattern: /^[A-Z]([^A-Z]*|[A-Z]+\s)[^A-Z]*([A-Z]+[^A-Z]*)*$/
 ignore:
   - .github
+  - symfony-app

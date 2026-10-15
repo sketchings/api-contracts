@@ -1,0 +1,33 @@
+{
+    "coverage_baseline_version": 1,
+    "uncovered_responses": [
+        {
+            "spec": "openapi",
+            "method": "GET",
+            "path": "/museum-hours",
+            "status": "404",
+            "content_type": "application/problem+json"
+        },
+        {
+            "spec": "openapi",
+            "method": "GET",
+            "path": "/special-events",
+            "status": "404",
+            "content_type": "application/problem+json"
+        },
+        {
+            "spec": "openapi",
+            "method": "GET",
+            "path": "/tickets/{ticketId}/qr",
+            "status": "200",
+            "content_type": "image/png"
+        },
+        {
+            "spec": "openapi",
+            "method": "POST",
+            "path": "/special-events",
+            "status": "404",
+            "content_type": "application/problem+json"
+        }
+    ]
+}

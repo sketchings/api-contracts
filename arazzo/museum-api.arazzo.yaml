@@ -1,4 +1,4 @@
-arazzo: 1.0.0
+arazzo: 1.0.1
 info:
   title: Redocly Museum API Test Workflow
   description: >-
@@ -10,7 +10,7 @@ sourceDescriptions:
   - name: museum-api
     type: openapi
     url: ../openapi.yaml
-    x-serverUrl: "http://localhost:4000/_mock/openapi" # For local development testing
+    x-serverUrl: "https://localhost:8000" # For local development testing
   - name: tickets-from-museum-api
     type: arazzo
     url: museum-tickets.arazzo.yaml
@@ -19,10 +19,30 @@ workflows:
   - workflowId: get-museum-hours
     description: >-
       This workflow demonstrates how to get the museum opening hours and buy tickets.
-    parameters:
-      - in: header
-        name: Authorization
-        value: Basic Og==
+    inputs:
+      type: object
+      properties:
+        env:
+          type: object
+          description: Read from environment variables.
+          properties:
+            MUSEUM_API_USER:
+              type: string
+              description: Username for MuseumPlaceholderAuth (HTTP basic).
+            MUSEUM_API_PASSWORD:
+              type: string
+              format: password
+              description: Password for MuseumPlaceholderAuth (HTTP basic).
+          required:
+            - MUSEUM_API_USER
+            - MUSEUM_API_PASSWORD
+      required:
+        - env
+    x-security:
+      - schemeName: $sourceDescriptions.museum-api.MuseumPlaceholderAuth
+        values:
+          username: $inputs.env.MUSEUM_API_USER
+          password: $inputs.env.MUSEUM_API_PASSWORD
     steps:
       - stepId: get-museum-hours
         description: >-
@@ -41,10 +61,30 @@ workflows:
   - workflowId: events-crud
     description: >-
       This workflow demonstrates how to list, create, update, and delete special events at the museum.
-    parameters:
-      - in: header
-        name: Authorization
-        value: Basic Og==
+    inputs:
+      type: object
+      properties:
+        env:
+          type: object
+          description: Read from environment variables.
+          properties:
+            MUSEUM_API_USER:
+              type: string
+              description: Username for MuseumPlaceholderAuth (HTTP basic).
+            MUSEUM_API_PASSWORD:
+              type: string
+              format: password
+              description: Password for MuseumPlaceholderAuth (HTTP basic).
+          required:
+            - MUSEUM_API_USER
+            - MUSEUM_API_PASSWORD
+      required:
+        - env
+    x-security:
+      - schemeName: $sourceDescriptions.museum-api.MuseumPlaceholderAuth
+        values:
+          username: $inputs.env.MUSEUM_API_USER
+          password: $inputs.env.MUSEUM_API_PASSWORD
     steps:
       - stepId: list-events
         description: >-
@@ -68,7 +108,7 @@ workflows:
         successCriteria:
           - condition: $statusCode == 201
           - context: $response.body
-            condition: $.name == 'Mermaid Treasure Identification and Analysis'
+            condition: $[?(@.name == 'Mermaid Treasure Identification and Analysis')]
             type: jsonpath
         outputs:
           createdEventId: $response.body#/eventId
@@ -104,7 +144,7 @@ workflows:
         successCriteria:
           - condition: $statusCode == 200
           - context: $response.body
-            condition: $.name == 'Orca Identification and Analysis'
+            condition: $[?(@.name == 'Orca Identification and Analysis')]
             type: jsonpath
         outputs:
           updatedEventId: $response.body#/eventId

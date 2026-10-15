@@ -1,0 +1,6 @@
+### GET museum hours
+GET https://{{host}}/museum-hours
+Accept: application/json
+Authorization: Basic {{username}} {{password}}
+
+###

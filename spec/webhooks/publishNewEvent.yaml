@@ -1,0 +1,17 @@
+post:
+  summary: New special event added
+  description: Publish details of a new or updated event.
+  operationId: publishNewEvent
+  tags:
+    - Events
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/SpecialEvent.yaml
+        examples:
+          default_example:
+            $ref: ../components/examples/GetSpecialEventResponseExample.yaml
+  responses:
+    '202':
+      description: Data accepted.

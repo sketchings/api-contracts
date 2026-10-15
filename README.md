@@ -1,7 +1,12 @@
-# Redocly Museum API Example
+# API Contracts in PHP - Museum API Example
 
 An imaginary, but delightful Museum API for interacting with museum services and information.
-Built by Redocly for educational purposes.
+The original OpenAPI spec sample was built by Redocly for educational purposes at https://github.com/Redocly/museum-openapi-example/blob/main/openapi.yaml.
+The original sample was exteded by:
+ - splinting the original yaml into separate parts that can be bundled
+ - a demo symfony-app was built to run tests against
+ - The [studio-design/gesso](https://github.com/studio-design/gesso) package was added to validate the API responses against the OpenAPI specification during testing, and get a coverage report showing which endpoints have been tested.
+ - Schemathesis was added for more complete contract testing that does not rely on integration with the app code.
 
 > [!NOTE]  
 > This OpenAPI description uses the [OpenAPI 3.1.0 specification](https://spec.openapis.org/oas/v3.1.0).
@@ -9,9 +14,6 @@ Built by Redocly for educational purposes.
 ## Overview
 
 Introducing the "Museum API", which offers a set of endpoints to interact with a museum's services--such as retrieving museum hours, managing special events, and purchasing tickets.
-
-New functionality may be added to the Museum API in the future.
-Is there an example you'd like to see? Please [open an issue](https://github.com/Redocly/museum-openapi-example/issues/new).
 
 ## Features
 
@@ -49,14 +51,15 @@ The Museum API has the following core features (sorted by tags):
 ### Working with the OpenAPI description
 
 We encourage you to explore the museum's OpenAPI description and make changes.
+
 Try experimenting with the following approaches:
 
 **Preview the Museum OpenAPI example's API docs and observe your changes visually.**
 
-- Run `npm run preview` to preview the documentation.
+- Run `make openapi-preview` to preview the documentation.
 - Navigate to the **List special events** operation in the preview.
 - With the preview running...
-  - Go to the _openapi.yaml_ file in your IDE.
+  - Go to the `spec` folder in your IDE.
   - Search for `listSpecialEvents` to find the matching `operationId`.
   - Replace the `description` field with the snippet below:
 
@@ -67,11 +70,13 @@ Try experimenting with the following approaches:
         See one you like? Use this API to [buy a ticket](/#tag/Tickets/operation/buyMuseumTickets).  
 ```
 
+Run `make openapi-bundle` to bundle the changes
+
 See the updated description? This is a great way to preview how end-users of your docs will experience your changes.
 
 **Lint your changes to the OpenAPI description using [Redocly CLI](https://redocly.com/docs/cli/).**
 
-- Open the museum's _openapi.yaml_ file in your IDE. 
+- Open the museum's `spec/openapi.yaml` file in your IDE. 
 - Add the following snippet to `paths` above the /museum-hours operation:
 
 ```yaml
@@ -86,7 +91,7 @@ See the updated description? This is a great way to preview how end-users of you
           description: Bad Request
 ```
 
-- Run `npm run lint` in your terminal. See the errors? 
+- Run `make openapi-lint` in your terminal. See the errors? 
 
 The linting behavior is controlled by the _redocly.yaml_ configuration file.
 The linter is configured to use Redocly's [recommended ruleset](https://redocly.com/docs/cli/rules/recommended/#recommended-ruleset), which are built into the CLI.
@@ -95,4 +100,9 @@ However, we also added a [configurable rule](https://redocly.com/docs/cli/rules/
 **Lint an Arazzo description using [Redocly CLI](https://redocly.com/docs/cli/).**
 
 - Redocly CLI can also lint formats other than OpenAPI, such as the Arazzo format.
-- Run `npm run lint arazzo/museum-api.arazzo.yaml` to lint an example Arazzo description.
+- Run `make arazzo-lint` to lint an example Arazzo description.
+
+**Execute an Arazzo description using [Redocly CLI](https://redocly.com/docs/cli/).**
+
+- Redocly CLI can also execute API tests described in an Arazzo description using `respect`
+- Run `make arazzo-test` to test an example Arazzo description.

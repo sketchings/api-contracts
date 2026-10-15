@@ -1,0 +1,12 @@
+description: Details for a museum ticket after a successful purchase.
+allOf:
+  - $ref: ./Ticket.yaml
+  - type: object
+    properties:
+      message:
+        $ref: ./TicketMessage.yaml
+      confirmationCode:
+        $ref: ./TicketConfirmation.yaml
+    required:
+      - message
+      - confirmationCode
