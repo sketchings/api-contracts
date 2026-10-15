@@ -9,7 +9,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: ../components/schemas/BuyMuseumTickets.yaml
+          $ref: ../components/schemas/BuyMuseumTicket.yaml
         examples:
           general_entry:
             $ref: ../components/examples/BuyGeneralTicketsRequestExample.yaml

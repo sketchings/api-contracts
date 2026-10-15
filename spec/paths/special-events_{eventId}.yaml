@@ -1,7 +1,6 @@
 get:
   summary: Get special event
   description: Get details about a special event.
-  operationId: getSpecialEvent
   tags:
     - Events
   parameters:
@@ -18,8 +17,6 @@ get:
               $ref: ../components/examples/GetSpecialEventResponseExample.yaml
     '400':
       $ref: ../components/responses/BadRequest.yaml
-    '404':
-      $ref: ../components/responses/NotFound.yaml
 patch:
   summary: Update special event
   description: Update the details of a special event.
