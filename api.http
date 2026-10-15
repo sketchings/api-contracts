@@ -1,6 +1,81 @@
 ### GET museum hours
 GET https://{{host}}/museum-hours
-Accept: application/json
 Authorization: Basic {{username}} {{password}}
 
-###
+### GET museum hours for a date range, paginated
+GET https://{{host}}/museum-hours?startDate=2023-09-11&endDate=2023-09-15&page=1&limit=5
+Authorization: Basic {{username}} {{password}}
+
+### POST create a special event (saves eventId for the requests below)
+POST https://{{host}}/special-events
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+  "name": "Longhorn PHP",
+  "location": "Austin TX",
+  "eventDescription": "A 2-day conference to help PHP developers level up their craft and connect with the larger PHP community.",
+  "dates": [
+    "2026-10-15",
+    "2026-10-16"
+  ],
+  "price": 350
+}
+
+> {% client.global.set("eventId", response.body.eventId); %}
+
+### GET list special events
+GET https://{{host}}/special-events?startDate=2023-01-01&endDate=2027-12-31&page=1&limit=10
+Authorization: Basic {{username}} {{password}}
+
+### GET a special event
+GET https://{{host}}/special-events/{{eventId}}
+Authorization: Basic {{username}} {{password}}
+
+### PATCH update a special event
+PATCH https://{{host}}/special-events/{{eventId}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+  "location": "Holiday Inn Austin Midtown, Austin TX",
+  "price": 300
+}
+
+### POST buy a general entry ticket (saves ticketId for the QR request)
+POST https://{{host}}/tickets
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+  "ticketType": "general",
+  "ticketDate": "2026-10-15",
+  "email": "todd@example.com"
+}
+
+> {% client.global.set("ticketId", response.body.ticketId); %}
+
+### POST buy a special event ticket
+POST https://{{host}}/tickets
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+  "ticketType": "event",
+  "eventId": "{{eventId}}",
+  "ticketDate": "2026-10-15",
+  "email": "alena@example.com"
+}
+
+### GET ticket QR code (PNG)
+GET https://{{host}}/tickets/{{ticketId}}/qr
+Authorization: Basic {{username}} {{password}}
+Accept: image/png
+
+### DELETE a special event
+DELETE https://{{host}}/special-events/{{eventId}}
+Authorization: Basic {{username}} {{password}}
+
+### GET a special event that does not exist (404 problem+json)
+GET https://{{host}}/special-events/00000000-0000-4000-8000-000000000000
+Authorization: Basic {{username}} {{password}}
